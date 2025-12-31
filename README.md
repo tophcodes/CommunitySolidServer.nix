@@ -1,21 +1,46 @@
 CommunitySolidServer Nix Flake
 ==============================
 
-This Nix Flake provides a package and a NixOS module for the [CommunitySolidServer](https://solidcommunity.be/community-solid-server/), a node.js based server that implements the Solid specification. The Solid specification is a framework for decentralized social networking, allowing users to own and control their own data.
-The project describes itself as an "open software that provides you with a [Solid](https://solidproject.org/) Pod and identity. That Pod acts as your own personal storage space so you can share data with people and Solid applications."
+This Nix Flake provides a package and a NixOS module for the [CommunitySolidServer](https://solidcommunity.be/community-solid-server/) (v7.1.7), a Node.js-based server that implements the Solid specification. The Solid specification is a framework for decentralized social networking, allowing users to own and control their own data.
 
-To use this Nix Flake, you will need to have [Nix](https://nixos.org/nix/) and optionally, to use the module [NixOS](https://nixos.org/) installed on your system.
+The project describes itself as "open software that provides you with a [Solid](https://solidproject.org/) Pod and identity. That Pod acts as your own personal storage space so you can share data with people and Solid applications."
+
+This flake uses a modern **flake-parts** architecture with modular organization for better maintainability and extensibility.
+
+## Requirements
+
+To use this Nix Flake, you will need:
+- [Nix](https://nixos.org/nix/) with flakes enabled
+- Optionally, [NixOS](https://nixos.org/) to use the system module
+
+## Architecture
+
+This flake is organized using `flake-parts` with the following structure:
+
+```
+/
+├── flake.nix              # Main entry point
+├── nix/
+│   ├── packages.nix       # Package and app definitions
+│   ├── nixos-modules.nix  # NixOS service module
+│   └── devshell.nix       # Development environment
+```
+
+**What's included:**
+- Uses nixpkgs 24.11 (latest stable)
+- Community Solid Server v7.1.7
+- Node.js 18.x LTS
+- Modular flake-parts structure for easy customization
 
 Installation
 ------------
 
 To install the CommunitySolidServer package and NixOS module, you can add the following lines to your `flake.nix` file:
 
-```
+```nix
 {
-
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     community-solid-server = {
       url = "github:gravio-la/CommunitySolidServer.nix#main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -29,7 +54,7 @@ To install the CommunitySolidServer package and NixOS module, you can add the fo
       inherit system;
     };
   in
-  rec {
+  {
     nixosConfigurations = {
       sampleHost = nixpkgs.lib.nixosSystem {
         inherit system;
@@ -43,31 +68,29 @@ To install the CommunitySolidServer package and NixOS module, you can add the fo
         ];
       };
     };
-  }
+  };
 }
 ```
 
-NixOS Container
----------------
+## Development
 
-This flake provides a preconfigured container to test and avaluate the CommunitySolidServer.
+Enter the development environment:
 
-look at the Makefile targets to see how to operate on them
+```bash
+nix develop
+```
 
-`nixos-rebuild`: This target rebuilds the NixOS container for the solidserver service using the `nixos-container update` command.
+Build the package:
 
-`nixos-create`: This target creates a new NixOS container for the solidserver service using the `nixos-container create` command.
+```bash
+nix build
+```
 
-`nixos-update`: This target updates the solidserver service by stopping the current container, rebuilding the container, and starting the new container.
+Run the server:
 
-`nixos-stop`: This target stops the solidserver service by using the `nixos-container stop` command.
-
-`nixos-start`: This target starts the solidserver service by using the `nixos-container start` command.
-
-`nixos-login`: This target starts the solidserver service and logs in to the container using the `nixos-container root-login` command.
-
-`nixos-destroy`: This target destroys the solidserver service container using the `nixos-container destroy` command.
-
+```bash
+nix run
+```
 
 Configuration
 -------------
@@ -93,10 +116,8 @@ Here is a description of each option:
 
 For example, to change the port that the server listens on, you can set the `port` option in your `configuration.nix` file:
 
-
-```
+```nix
 {
-
   services.solid-server = {
     enable = true;
     package = pkgs.solid-server;
@@ -110,15 +131,17 @@ Running the CommunitySolidServer
 
 Once the CommunitySolidServer package and NixOS module are installed and configured, you can start the server by running the following command:
 
-
-`systemctl start solid-server`
+```bash
+systemctl start solid-server
+```
 
 To stop the server, use the `stop` command instead:
 
-
-`systemctl stop solid-server`
+```bash
+systemctl stop solid-server
+```
 
 Contributing
 ------------
 
-If you would like to contribute to this Nix Flake,  please feel free to submit a pull request on GitHub.
+If you would like to contribute to this Nix Flake, please feel free to submit a pull request on GitHub.
