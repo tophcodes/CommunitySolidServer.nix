@@ -15,6 +15,7 @@
         ./nix/nixos-modules.nix
         ./nix/devshell.nix
         ./nix/checks.nix
+        ./nix/vm-test.nix
       ];
     };
 }

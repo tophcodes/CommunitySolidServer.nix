@@ -36,7 +36,7 @@
 
       configFile = lib.mkOption {
         type = lib.types.path;
-        default = "${self.packages.${pkgs.system}.default}/config/default.json";
+        default = "${self.packages.${pkgs.system}.default}/lib/config/default.json";
         description = "The configuration(s) for the server. The default only stores data in memory; to persist to your filesystem, use `@css:config/file.json`";
       };
 
@@ -59,9 +59,9 @@
       };
 
       podConfigJson = lib.mkOption {
-        type = lib.types.path;
-        default = "${self.packages.${pkgs.system}.default}/pod-config.json";
-        description = "Path to the file that keeps track of dynamic Pod configurations. Only relevant when using `@css:config/dynamic.json`.";
+        type = lib.types.nullOr lib.types.path;
+        default = null;
+        description = "Path to the file that keeps track of dynamic Pod configurations. Only relevant when using `@css:config/dynamic.json`. If null, the server will use its default location.";
       };
 
       seededPodConfigJson = lib.mkOption {
@@ -95,7 +95,7 @@
 
           serviceConfig = {
             ExecStart = ''
-              ${cfg.package}/bin/server \
+              ${lib.getExe cfg.package} \
                 --port ${toString cfg.port} \
                 --baseUrl ${cfg.baseUrl} \
                 ${lib.optionalString (cfg.socket != null) "--socket ${cfg.socket}"} \

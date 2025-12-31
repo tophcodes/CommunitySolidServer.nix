@@ -31,9 +31,9 @@
         cp -rv config $out/lib/
         cp -rv templates $out/lib/
 
-        cat > $out/bin/${pname} << 'EOF'
+        cat > $out/bin/${pname} << EOF
         #!/bin/sh
-        exec ${pkgs.lib.getExe pkgs.nodejs} $out/lib/bin/server.js "$@"
+        exec ${pkgs.lib.getExe pkgs.nodejs} $out/lib/bin/server.js "\$@"
         EOF
 
         chmod +x $out/bin/${pname}
@@ -72,6 +72,11 @@
       '';
 
       meta.mainProgram = "${pname}";
+    };
+
+    apps.default = {
+      type = "app";
+      program = "${config.packages.default}/bin/${config.packages.default.pname}";
     };
   };
 }
